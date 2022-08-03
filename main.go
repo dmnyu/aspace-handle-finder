@@ -36,10 +36,6 @@ func main() {
 	defer httpFile.Close()
 	httpWriter := bufio.NewWriter(httpFile)
 
-	httpsFile, _ := os.Create("https-handles.txt")
-	defer httpsFile.Close()
-	httpsWriter := bufio.NewWriter(httpsFile)
-
 	for _, repoID := range []int{2, 3, 6} {
 		initialRequest, err := asclient.Search(repoID, "digital_object", "*", 1)
 		if err != nil {
@@ -53,6 +49,7 @@ func main() {
 				log.Println(err)
 				continue
 			}
+
 			for _, resource := range request.Results {
 				do := aspace.DigitalObject{}
 				do_bytes := []byte(fmt.Sprint(resource["json"]))
@@ -64,9 +61,6 @@ func main() {
 					if strings.Contains(fv.FileURI, httpHandle) {
 						httpCount++
 						httpWriter.WriteString(fmt.Sprintf("%s %s\n", do.URI, fv.FileURI))
-					} else if strings.Contains(fv.FileURI, httpsHandle) {
-						httpsCount++
-						httpsWriter.WriteString(fmt.Sprintf("%s %s\n", do.URI, fv.FileURI))
 					}
 				}
 			}
